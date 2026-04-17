@@ -602,6 +602,31 @@ function CounterPage({ data, setData, allDhikr, accentColor, setTab }) {
     <div className="counter-page">
       {showFlash && <div className="completion-flash" />}
       
+      <div style={{ position: "absolute", top: "16px", left: "20px", zIndex: 5 }}>
+        <select 
+          value={target}
+          onChange={(e) => setData(d => ({ ...d, settings: { ...d.settings, target: parseInt(e.target.value) } }))}
+          style={{ 
+            background: "var(--surface2)", 
+            color: "var(--text-muted)", 
+            border: "1px solid var(--border)", 
+            borderRadius: "14px", 
+            padding: "6px 10px", 
+            fontFamily: "var(--font-body)", 
+            outline: "none", 
+            fontSize: "13px", 
+            cursor: "pointer",
+            letterSpacing: "0.05em"
+          }}
+        >
+          <option value={33}>Goal: 33</option>
+          <option value={99}>Goal: 99</option>
+          <option value={100}>Goal: 100</option>
+          <option value={1000}>Goal: 1000</option>
+          <option value={0}>Goal: ∞</option>
+        </select>
+      </div>
+
       <div className="counter-audio-btns">
         <button className="audio-btn" onClick={() => setTab("settings")} style={{ marginRight: "4px" }} title="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
