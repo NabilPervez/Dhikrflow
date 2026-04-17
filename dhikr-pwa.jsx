@@ -113,9 +113,12 @@ const PRESET_DHIKR = [
 
 const CATEGORIES = ["All", "Core", "99 Names", "Morning", "Evening", "Salawat", "Custom"];
 const ACCENT_COLORS = [
-  { name: "Orange", value: "#d97757", glow: "rgba(217,119,87,0.3)" },
-  { name: "Blue", value: "#6a9bcc", glow: "rgba(106,155,204,0.3)" },
-  { name: "Green", value: "#788c5d", glow: "rgba(120,140,93,0.3)" }
+  { name: "Emerald", value: "#10b981", glow: "rgba(16,185,129,0.3)" },
+  { name: "Gold", value: "#f59e0b", glow: "rgba(245,158,11,0.3)" },
+  { name: "Sapphire", value: "#3b82f6", glow: "rgba(59,130,246,0.3)" },
+  { name: "Rose", value: "#f43f5e", glow: "rgba(244,63,94,0.3)" },
+  { name: "Violet", value: "#8b5cf6", glow: "rgba(139,92,246,0.3)" },
+  { name: "Teal", value: "#14b8a6", glow: "rgba(20,184,166,0.3)" },
 ];
 
 // ─── STORAGE ────────────────────────────────────────────────────────────────
@@ -298,24 +301,23 @@ function useAppData() {
 // ─── COMPONENTS ────────────────────────────────────────────────────────────
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Scheherazade+New:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Crimson+Pro:wght@300;400;600&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   
   :root {
-    --bg: #141413;
-    --surface: #1a1a19;
-    --surface2: #242422;
-    --surface3: #2d2d2a;
-    --border: #b0aea5;
-    --text: #faf9f5;
-    --text-muted: #e8e6dc;
-    --text-dim: #b0aea5;
-    --accent: #d97757;
-    --accent-glow: rgba(217,119,87,0.25);
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface2: #111111;
+    --surface3: #1a1a1a;
+    --border: #1f1f1f;
+    --text: #e8e8e4;
+    --text-muted: #5a5a54;
+    --text-dim: #3a3a36;
+    --accent: #10b981;
+    --accent-glow: rgba(16,185,129,0.25);
     --font-arabic: 'Scheherazade New', serif;
-    --font-heading: 'Poppins', Arial, sans-serif;
-    --font-body: 'Lora', Georgia, serif;
+    --font-body: 'Crimson Pro', Georgia, serif;
     --nav-height: 64px;
   }
 

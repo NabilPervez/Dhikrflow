@@ -1,41 +1,43 @@
 # DhikrFlow Brand Bible
 
 ## Overview
-This Brand Bible defines the visual identity for DhikrFlow. The design system focuses on the flow-state paradigm, blending modern minimalism with timeless cultural nuances. To ensure readability and an elegant feel, the brand adopts a refined typography and color palette inspired by the Anthropic design guidelines.
+This Brand Bible defines the authentic visual identity for DhikrFlow. The design system is constructed around a true pitch-black aesthetic, prioritizing completely immersive flow-states, particularly suitable for OLED displays and reducing battery consumption.
+
+## Typography
+The overall typographic execution feels meditative, timeless, and rooted in classical script forms.
+
+- **English Body & Transliteration**: `Crimson Pro`, falling back to `Georgia` or `serif`. Used because of its highly legible, elegant proportions and classical feel.
+- **Arabic Text**: `Scheherazade New`, falling back to `serif`. Extensively tailored to render pure Arabic glyphs with clarity, grace, and ample vertical spacing.
 
 ## Color Palette
 
-### Base & Surfaces
-The application uses deep, warm darks rather than harsh blacks, ensuring ease on the eyes during prolonged use and matching Anthropic's sophisticated styling.
+### Base Structure (OLED Noir)
+The environment favors true blacks and deeply subdued surfaces, drawing maximum focus only to the Dhikr being recited.
 
-- **Background (Dark)**: `#141413` — The primary canvas color.
-- **Surface Level 1**: `#1a1a19` — Used for standard cards and list items.
-- **Surface Level 2**: `#242422` — Used for active states, inputs, and raised surfaces.
-- **Surface Level 3**: `#2d2d2a` — Used for prominent borders and distinctly separated elements.
+- **Background (True Void)**: `#000000` — Ensures absolute contrast and OLED optimization.
+- **Surface Level 1**: `#0a0a0a` — Used for active cards and interactive backgrounds.
+- **Surface Level 2**: `#111111` — Used for secondary elements, borders, and input fields.
+- **Surface Level 3**: `#1a1a1a` — Used sparingly for overlays, toggles, and raised modal menus.
+- **Borders**: `#1f1f1f` — Minimal distinction to separate sections without distracting the eye.
 
 ### Typography Colors
-- **Primary Text (Light)**: `#faf9f5` — High contrast text, titles, and main values.
-- **Muted Text**: `#e8e6dc` — Secondary content, subtitles, and descriptions.
-- **Dim/Placeholder Text**: `#b0aea5` — Helpful hints, timestamps, and border treatments.
+- **Primary Text**: `#e8e8e4` — A soft, off-white bone color. Much easier on the eyes in a pitch-black environment than stark `#ffffff`.
+- **Muted Text**: `#5a5a54` — Used for translations, subheadings, and UI states.
+- **Dim Text**: `#3a3a36` — Barely visible elements, hints, and placeholder text.
 
-### Accent Palette
-Accents are used for interactions, data visualization, and micro-animations.
+### Thematic Accents
+DhikrFlow allows personalization while retaining its dark aesthetic. Each accent brings life to the circular progress ring and interaction ripples.
 
-- **Primary Accent (Orange)**: `#d97757` — The core interaction color. Brings warmth and focus.
-- **Secondary Accent (Blue)**: `#6a9bcc` — Used for alternate themes; imparts calm and serenity.
-- **Tertiary Accent (Green)**: `#788c5d` — A natural, grounding accent for growth and completion themes.
+- **Emerald (Default)**: `#10b981` — Classic Islamic green; soothing and universally recognized.
+- **Gold**: `#f59e0b` — Warm, reflective, and premium.
+- **Sapphire**: `#3b82f6` — Cool and calming.
+- **Rose**: `#f43f5e` — Expressive and vibrant.
+- **Violet**: `#8b5cf6` — Deep, contemplative energy.
+- **Teal**: `#14b8a6` — A modern alternative to Emerald.
 
-*(Note: These accent colors also feature a 25% opacity "glow" `rgba()` variant for focus states and ring halos).*
+*(Accents are paired with a 25% opacity `rgba()` exact equivalent for "glow" effects—e.g., surrounding the ring or lighting the background of the ripple effect).*
 
-## Typography
-
-The fontstack distinguishes between headings (clean, geometric), body copy (readable, elegant serif), and Arabic script (traditional, high-legibility).
-
-- **Headings & UI Elements**: `Poppins`, with `Arial` and `sans-serif` as fallbacks. Used to give the interface a structured, grounded feel.
-- **Body & English Translations**: `Lora`, with `Georgia` and `serif` fallbacks. Emphasizes elegance and sustained readability.
-- **Arabic Text**: `Scheherazade New`, with general `serif` fallback. Generously sized and well-spaced for comfort.
-
-## UI Principles
-1. **The Thumb Zone**: Every major interaction should be reachable within the bottom half of the screen.
-2. **Audio-First**: Haptic clicks and generated brown noise offer an immersive sanctuary.
-3. **PWA Native**: No browser chrome. Always `standalone` display mode. Visually looks indistinguishable from a native mobile application.
+## Visual Assets & UI Delivery
+1. **Uninterrupted Interfaces**: Bottom navigation remains clean with only essential icons. Settings are tucked away discreetly at the top right, freeing the entire center and lower screen for the gesture interaction area.
+2. **Invisible Geometry**: Cards do not use hard drop shadows. They rely heavily on sub-10% lightness differences and 1px borders.
+3. **PWA Standalone Integrity**: The application must be delivered without native browser UI (`standalone`).
