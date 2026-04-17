@@ -113,12 +113,9 @@ const PRESET_DHIKR = [
 
 const CATEGORIES = ["All", "Core", "99 Names", "Morning", "Evening", "Salawat", "Custom"];
 const ACCENT_COLORS = [
-  { name: "Emerald", value: "#10b981", glow: "rgba(16,185,129,0.3)" },
-  { name: "Gold", value: "#f59e0b", glow: "rgba(245,158,11,0.3)" },
-  { name: "Sapphire", value: "#3b82f6", glow: "rgba(59,130,246,0.3)" },
-  { name: "Rose", value: "#f43f5e", glow: "rgba(244,63,94,0.3)" },
-  { name: "Violet", value: "#8b5cf6", glow: "rgba(139,92,246,0.3)" },
-  { name: "Teal", value: "#14b8a6", glow: "rgba(20,184,166,0.3)" },
+  { name: "Orange", value: "#d97757", glow: "rgba(217,119,87,0.3)" },
+  { name: "Blue", value: "#6a9bcc", glow: "rgba(106,155,204,0.3)" },
+  { name: "Green", value: "#788c5d", glow: "rgba(120,140,93,0.3)" }
 ];
 
 // ─── STORAGE ────────────────────────────────────────────────────────────────
@@ -154,6 +151,7 @@ function initData() {
       noise_volume: 0.3,
       click_enabled: true,
       noise_enabled: false,
+      click_profile: 0,
       accent_index: 0,
       target: 33,
       custom_target: null,
@@ -176,11 +174,20 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function playClick(volume = 0.7) {
+const CLICK_PROFILES = [
+  { f1: 120, f1e: 55, f2: 280, f2e: 120, n: 0.3, len1: 0.15, len2: 0.08, lenN: 0.06 },   // Thwack (Original)
+  { f1: 320, f1e: 120, f2: 680, f2e: 220, n: 0.1, len1: 0.05, len2: 0.03, lenN: 0.02 },  // Crisp Tick
+  { f1: 80,  f1e: 40, f2: 180, f2e: 80,  n: 0.5, len1: 0.2, len2: 0.1, lenN: 0.08 },   // Dull Thud
+  { f1: 520, f1e: 240, f2: 980, f2e: 420, n: 0.05, len1: 0.03, len2: 0.02, lenN: 0.01 }, // Glass Tap
+  { f1: 180, f1e: 75, f2: 380, f2e: 180, n: 0.25, len1: 0.1, len2: 0.06, lenN: 0.04 }    // Medium Pop
+];
+
+function playClick(volume = 0.7, profileIdx = 0) {
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
-    // Layered click: low thwack + transient
+    const p = CLICK_PROFILES[profileIdx] || CLICK_PROFILES[0];
+    
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain1 = ctx.createGain();
@@ -188,18 +195,17 @@ function playClick(volume = 0.7) {
     const masterGain = ctx.createGain();
 
     osc1.type = "sine";
-    osc1.frequency.setValueAtTime(120, now);
-    osc1.frequency.exponentialRampToValueAtTime(55, now + 0.08);
+    osc1.frequency.setValueAtTime(p.f1, now);
+    osc1.frequency.exponentialRampToValueAtTime(p.f1e, now + 0.08);
     gain1.gain.setValueAtTime(volume * 0.9, now);
     gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
     osc2.type = "sine";
-    osc2.frequency.setValueAtTime(280, now);
-    osc2.frequency.exponentialRampToValueAtTime(120, now + 0.04);
+    osc2.frequency.setValueAtTime(p.f2, now);
+    osc2.frequency.exponentialRampToValueAtTime(p.f2e, now + 0.04);
     gain2.gain.setValueAtTime(volume * 0.5, now);
     gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
-    // Noise burst
     const bufSize = ctx.sampleRate * 0.04;
     const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -207,16 +213,16 @@ function playClick(volume = 0.7) {
     const noiseSource = ctx.createBufferSource();
     noiseSource.buffer = buffer;
     const noiseG = ctx.createGain();
-    noiseG.gain.setValueAtTime(volume * 0.3, now);
+    noiseG.gain.setValueAtTime(volume * p.n, now);
 
     osc1.connect(gain1); gain1.connect(masterGain);
     osc2.connect(gain2); gain2.connect(masterGain);
     noiseSource.connect(noiseG); noiseG.connect(masterGain);
     masterGain.connect(ctx.destination);
 
-    osc1.start(now); osc1.stop(now + 0.15);
-    osc2.start(now); osc2.stop(now + 0.08);
-    noiseSource.start(now); noiseSource.stop(now + 0.06);
+    osc1.start(now); osc1.stop(now + p.len1);
+    osc2.start(now); osc2.stop(now + p.len2);
+    noiseSource.start(now); noiseSource.stop(now + p.lenN);
   } catch {}
 }
 
@@ -292,23 +298,24 @@ function useAppData() {
 // ─── COMPONENTS ────────────────────────────────────────────────────────────
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Crimson+Pro:wght@300;400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Scheherazade+New:wght@400;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   
   :root {
-    --bg: #000000;
-    --surface: #0a0a0a;
-    --surface2: #111111;
-    --surface3: #1a1a1a;
-    --border: #1f1f1f;
-    --text: #e8e8e4;
-    --text-muted: #5a5a54;
-    --text-dim: #3a3a36;
-    --accent: #10b981;
-    --accent-glow: rgba(16,185,129,0.25);
+    --bg: #141413;
+    --surface: #1a1a19;
+    --surface2: #242422;
+    --surface3: #2d2d2a;
+    --border: #b0aea5;
+    --text: #faf9f5;
+    --text-muted: #e8e6dc;
+    --text-dim: #b0aea5;
+    --accent: #d97757;
+    --accent-glow: rgba(217,119,87,0.25);
     --font-arabic: 'Scheherazade New', serif;
-    --font-body: 'Crimson Pro', Georgia, serif;
+    --font-heading: 'Poppins', Arial, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
     --nav-height: 64px;
   }
 
@@ -504,7 +511,7 @@ function Onboarding({ onDone }) {
 
 // ─── COUNTER PAGE ───────────────────────────────────────────────────────────
 
-function CounterPage({ data, setData, allDhikr, accentColor }) {
+function CounterPage({ data, setData, allDhikr, accentColor, setTab }) {
   const [ripples, setRipples] = useState([]);
   const [showFlash, setShowFlash] = useState(false);
   const [showHint, setShowHint] = useState(true);
@@ -534,7 +541,7 @@ function CounterPage({ data, setData, allDhikr, accentColor }) {
     }
 
     // Audio
-    if (settings.click_enabled) playClick(settings.click_volume);
+    if (settings.click_enabled) playClick(settings.click_volume, settings.click_profile);
 
     // Update data
     setData(prev => {
@@ -594,6 +601,11 @@ function CounterPage({ data, setData, allDhikr, accentColor }) {
       {showFlash && <div className="completion-flash" />}
       
       <div className="counter-audio-btns">
+        <button className="audio-btn" onClick={() => setTab("settings")} style={{ marginRight: "4px" }} title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
         <button className={`audio-btn${settings.click_enabled ? " on" : ""}`} onClick={toggleClick} title="Toggle click">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             {settings.click_enabled
@@ -808,16 +820,19 @@ function JourneyPage({ data, allDhikr }) {
       </div>
 
       <div className="section-label">This Week</div>
-      <div className="week-grid" style={{ marginBottom: 24 }}>
+      <div className="week-chart" style={{ display: "flex", gap: "8px", alignItems: "flex-end", height: "140px", marginBottom: "24px", paddingTop: "10px", borderBottom: "1px solid var(--border)" }}>
         {days.map(d => {
           const count = data.daily_log[d.key] || 0;
-          const intensity = count / maxDaily;
-          const bg = intensity > 0
-            ? `rgba(${parseInt(accentColor.value.slice(1, 3), 16)}, ${parseInt(accentColor.value.slice(3, 5), 16)}, ${parseInt(accentColor.value.slice(5, 7), 16)}, ${Math.max(0.15, intensity)})`
-            : "var(--surface2)";
+          const heightPct = maxDaily > 0 ? (count / maxDaily) * 100 : 0;
+          const bg = count > 0 ? accentColor.value : "var(--surface2)";
           return (
-            <div key={d.key} className={`week-cell${count > 0 ? " active-day" : ""}`} style={{ background: bg }}>
-              {d.label}
+            <div key={d.key} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", height: "100%" }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "flex-end", width: "100%", position: "relative" }}>
+                <div style={{ width: "100%", height: `${Math.max(2, heightPct)}%`, background: bg, borderRadius: "6px 6px 0 0", transition: "height 0.4s ease-out" }} />
+              </div>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--text-muted)" }}>
+                {d.label}
+              </span>
             </div>
           );
         })}
@@ -874,6 +889,27 @@ function SettingsPage({ data, setData }) {
           <div><div className="settings-row-label">Click Volume</div></div>
           <input type="range" min="0" max="1" step="0.05" value={s.click_volume}
             onChange={e => updateSetting("click_volume", parseFloat(e.target.value))} />
+        </div>
+        <div className="settings-row">
+          <div>
+            <div className="settings-row-label">Click Tone</div>
+            <div className="settings-row-sub">Select frequency profile</div>
+          </div>
+          <select 
+            value={s.click_profile || 0} 
+            onChange={e => {
+              const val = parseInt(e.target.value);
+              updateSetting("click_profile", val);
+              playClick(s.click_volume, val); 
+            }}
+            style={{ padding: "6px 10px", background: "var(--surface2)", color: "var(--text)", border: "1px solid var(--border)", borderRadius: "8px", fontFamily: "var(--font-body)", outline: "none" }}
+          >
+            <option value={0}>Thwack</option>
+            <option value={1}>Crisp Tick</option>
+            <option value={2}>Dull Thud</option>
+            <option value={3}>Glass Tap</option>
+            <option value={4}>Medium Pop</option>
+          </select>
         </div>
         <div className="settings-row">
           <div>
@@ -945,10 +981,13 @@ function SettingsPage({ data, setData }) {
         </div>
       </div>
 
-      <div style={{ paddingTop: 8, textAlign: "center" }}>
+      <div style={{ paddingTop: 24, textAlign: "center", borderTop: "1px solid var(--surface2)", marginTop: 24 }}>
         <div style={{ fontFamily: "var(--font-arabic)", fontSize: 22, color: "var(--text-muted)", marginBottom: 6 }}>بِسْمِ اللّٰهِ</div>
-        <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--text-dim)", letterSpacing: "0.1em" }}>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--text-dim)", letterSpacing: "0.1em", marginBottom: 12 }}>
           FLOW STATE DHIKR • FREE FOREVER
+        </div>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--text-muted)" }}>
+          Created by <a href="https://nabilpervezconsulting.com" target="_blank" rel="noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}>nabilpervezconsulting.com</a>
         </div>
       </div>
     </div>
@@ -981,16 +1020,7 @@ const TABS = [
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
       </svg>
     )
-  },
-  {
-    id: "settings", label: "Settings",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    )
-  },
+  }
 ];
 
 // ─── APP ROOT ───────────────────────────────────────────────────────────────
@@ -1020,7 +1050,7 @@ export default function App() {
         {!data.onboarded && <Onboarding onDone={handleOnboardDone} />}
 
         <div className="page" style={{ flex: 1, display: tab === "counter" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
-          {tab === "counter" && <CounterPage data={data} setData={setData} allDhikr={allDhikr} accentColor={accentColor} />}
+          {tab === "counter" && <CounterPage data={data} setData={setData} allDhikr={allDhikr} accentColor={accentColor} setTab={setTab} />}
         </div>
 
         {tab === "library" && (
